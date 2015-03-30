@@ -1,0 +1,4 @@
+#!/bin/bash
+./scripts/compile
+echo "Running ./scripts/test"
+mocha --no-colors --compilers coffee:coffee-script/register test/*_test.coffee
