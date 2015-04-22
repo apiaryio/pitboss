@@ -1,9 +1,11 @@
 {
   "name": "pitboss-ng",
   "version": "0.2.0",
-  "description": "Runs untrusted code in a seperate process using Node VM. Fork original pitboss with support coffee-script 1.8+",
+  "description": "Run untrusted code in a seperate process using VM module. Fork of original pitboss with timeout and memory limit management",
   "keywords": [
     "sandbox",
+    "memory limit",
+    "vm",
     "untrusted code"
   ],
   "repository": "git://github.com/apiaryio/pitboss.git",
@@ -23,7 +25,7 @@
     "coffee-script": "^1.9.2",
     "mocha": "^2.2.4"
   },
-  "main": "./lib/pitboss.js",
+  "main": "./lib/pitboss-ng.js",
   "engines": {
     "node": ">= 0.10.x"
   },
