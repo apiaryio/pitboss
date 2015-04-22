@@ -1,3 +1,4 @@
+path = require 'path'
 {fork, exec} = require 'child_process'
 {EventEmitter}  = require 'events'
 
@@ -36,11 +37,11 @@ exports.Runner = class Runner extends EventEmitter
     @callback = null
 
   launchFork: ->
-    @proc = fork(__dirname + '/../lib/forkable.js')
+    @proc = fork(path.join(__dirname, '../lib/forkable.js'), [], {cwd: path.join(__dirname, '..')})
     @proc.on 'message', @messageHandler
     @proc.on 'exit', @failedForkHandler
     @rssizeCommand = @options.rssizeCommand.replace('PID',@proc.pid)
-    @proc.send {code:@code}
+    @proc.send {code: @code, timeout: (@options.timeout + 100)}
 
   run: ({context, libraries}, callback) ->
     return false if @running
@@ -80,22 +81,24 @@ exports.Runner = class Runner extends EventEmitter
     error = @currentError || "Process Failed"
     @emit 'failed', error
     @callback(error) if @callback
-    @notifyCompleted()
+    @notifyCompleted() if @callback
 
   timeout: =>
-    @currentError = "Timedout"
+    @currentError ?= "Timedout"
     @kill()
 
   memoryExceeded: =>
-    exec @rssizeCommand,  (err, stdout, stderr) =>
-        err = err || stderr
+    exec @rssizeCommand, (err, stdout, stderr) =>
+      err = err || stderr
 
-        if err
-          console.error "Command #{@rssizeCommand} failed:", err
+      if err
+        console.error "Command #{@rssizeCommand} failed:", err
 
-        if (not err) and parseInt(stdout, 10) > @options.memoryLimit
-          @currentError = "MemoryExceeded"
-          @kill()
+      if (not err) and parseInt(stdout, 10) > @options.memoryLimit
+        @currentError = "MemoryExceeded"
+        @kill()
+      return
+    return
 
   notifyCompleted: ->
     @emit 'completed'

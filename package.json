@@ -1,29 +1,33 @@
 {
-  "name": "pitboss",
-  "version": "0.1.5",
-  "description": "Runs untrusted code in a seperate process using Node VM",
+  "name": "pitboss-ng",
+  "version": "0.2.0",
+  "description": "Run untrusted code in a seperate process using VM module. Fork of original pitboss with timeout and memory limit management",
   "keywords": [
     "sandbox",
+    "memory limit",
+    "vm",
     "untrusted code"
   ],
-  "repository": "git://github.com/mdp/pitboss.git",
-  "author": "Mark Percival <mark@markpercival.us> (http://markpercival.us)",
+  "repository": "git://github.com/apiaryio/pitboss.git",
+  "bugs": {
+    "url": "https://github.com/apiaryio/pitboss/issues"
+  },
+  "author": "Apiary Inc <support@apiary.io>",
   "scripts": {
-    "build": "rm -rf lib && coffee --bare --compile --output lib/ src/",
-    "postinstall": "rm -rf lib && coffee --bare --compile --output lib/ src/",
-    "test": "rm -rf lib && coffee --compile -o lib/ src/ && mocha --no-colors --compilers coffee:coffee-script/register test/*_test.coffee",
-    "prepublish": "rm -rf lib && coffee --compile -o lib/ src/"
+    "prepublish": "./scripts/compile",
+    "test": "./scripts/test"
   },
   "dependencies": {
-    "coffee-script": "~1.8.0"
+    "clone": "^1.0.2"
   },
   "devDependencies": {
-    "should": ">=1.1.0",
-    "mocha": ">=1.4.2"
+    "chai": "^2.2.0",
+    "coffee-script": "^1.9.2",
+    "mocha": "^2.2.4"
   },
-  "main": "./lib/pitboss.js",
+  "main": "./lib/pitboss-ng.js",
   "engines": {
-    "node": ">= 0.8.x"
+    "node": ">= 0.10.x"
   },
   "license": "MIT"
 }

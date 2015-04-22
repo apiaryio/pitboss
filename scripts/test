@@ -1,0 +1,4 @@
+#!/bin/bash
+./scripts/compile
+echo "Running ./scripts/test"
+mocha --recursive --timeout 120000 --compilers 'coffee:coffee-script/register' test/**/*_test.coffee
