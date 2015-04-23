@@ -17,8 +17,8 @@
   },
   "author": "Apiary Inc <support@apiary.io>",
   "scripts": {
-    "prepublish": "./scripts/compile",
-    "test": "./scripts/test"
+    "test": "gulp test",
+    "prepublish": "gulp build"
   },
   "dependencies": {
     "clone": "^1.0.2",
@@ -27,6 +27,10 @@
   "devDependencies": {
     "chai": "^2.2.0",
     "coffee-script": "^1.9.2",
+    "gulp": "^3.8.11",
+    "gulp-coffee": "^2.3.1",
+    "gulp-mocha": "^2.0.1",
+    "gulp-util": "^3.0.4",
     "mocha": "^2.2.4"
   },
   "main": "./lib/pitboss-ng.js",
