@@ -11,8 +11,8 @@ describe "The forkable process", ->
     return
 
   afterEach ->
-    @runner?.proc?.removeAllListeners 'exit'
     @runner?.kill?()
+    @runner = null
     return
 
   describe "basic operation", ->
@@ -137,37 +137,37 @@ describe "The forkable process", ->
 
     describe "from object for specifiyng context variable name", () ->
       beforeEach ->
-          @code = """
-            if(vmFooBar == undefined){
-              throw('vmFooBar is undefined');
-            }
-            null
-          """
+        @code = """
+          if(vmFooBar == undefined){
+            throw('vmFooBar is undefined');
+          }
+          null
+        """
 
-        it "should require and pass library to the context under variable with key name", (done) ->
-          @runner.on 'message', (msg) ->
-            assert.equal msg.id, "123"
-            assert.equal msg.result, null
-            assert.equal msg.error, null
-            done()
+      it "should require and pass library to the context under variable with key name", (done) ->
+        @runner.on 'message', (msg) ->
+          assert.equal msg.id, "123"
+          assert.equal msg.result, null
+          assert.equal msg.error, null
+          done()
 
-          @runner.send({code: @code}) # Setup
-          @runner.send({id: "123", context: {data:'foo'}, libraries: {'vmFooBar': 'vm'}}) # Setup
+        @runner.send({code: @code}) # Setup
+        @runner.send({id: "123", context: {data:'foo'}, libraries: {'vmFooBar': 'vm'}}) # Setup
 
     describe "from unintentional other type", () ->
       beforeEach ->
-          @code = """
-          var a = 'result'
-          a
-          """
+        @code = """
+        var a = 'result'
+        a
+        """
 
-        it "should raise and exception telling that it expects array or obejct", (done) ->
-          @runner.on 'message', (msg) ->
-            assert.equal msg.id, "1234"
-            assert.equal msg.result, undefined
-            assert.equal msg.error, "Pitboss error: Libraries must be defined by an array or by an object."
-            done()
+      it "should raise and exception telling that it expects array or obejct", (done) ->
+        @runner.on 'message', (msg) ->
+          assert.equal msg.id, "1234"
+          assert.equal msg.result, undefined
+          assert.equal msg.error, "Pitboss error: Libraries must be defined by an array or by an object."
+          done()
 
-          @runner.send({code: @code}) # Setup
-          @runner.send({id: "1234", context: {data:'foo'}, libraries: "vm"}) # Setup
+        @runner.send({code: @code}) # Setup
+        @runner.send({id: "1234", context: {data:'foo'}, libraries: "vm"}) # Setup
 
