@@ -7,6 +7,39 @@ Status](https://secure.travis-ci.org/apiaryio/pitboss.png)](http://travis-ci.org
 
 ## A module for running untrusted code
 
+```javascript
+var Pitboss = require('pitboss-ng').Pitboss;
+
+var untrustedCode = "var a = !true; a";
+
+var sandbox = new Pitboss(untrustedCode, {
+  memoryLimit: 32*1024, // 32 MB memory limit (default is 64 MB)
+  timeout: 5*1000, // 5000 ms to perform tasks or die (default is 500 ms = 0.5 s)
+  heartBeatTick: 100 // interval between memory-limit checks (default is 100 ms)
+});
+
+sandbox.run({
+  context: {
+    'foo': 'bar',
+    'key': 'value' // context must be JSON.stringify positive
+  },
+  libraries: {
+    myModule: path.join(__dirname, './my/own/module')
+    // will be available as global "myModule" variable for the untrusted code
+  }
+}, function callback (err, result) {
+  sandbox.kill(); // don't forget to kill the sandbox, if you don't need it anymore
+});
+
+// OR other option: libraries can be an array of system modules
+sandbox.run({
+  context: {},
+  libraries: ['console', 'lodash'] // we will be using global "lodash" & "console"
+}, function callback (err, result) {
+  // finished, kill the sandboxed process
+  sandbox.kill();
+});
+```
 
 ### Runs JS code and returns the last eval'd statement
 
