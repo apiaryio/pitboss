@@ -1,7 +1,7 @@
 {
   "name": "pitboss-ng",
-  "version": "0.2.1",
-  "description": "Run untrusted code in a seperate process using VM module. Fork of original pitboss with timeout and memory limit management",
+  "version": "0.3.0",
+  "description": "Run untrusted code in a seperate process using VM module. With timeout and memory limit management",
   "keywords": [
     "sandbox",
     "memory limit",
