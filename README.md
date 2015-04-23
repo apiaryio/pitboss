@@ -49,11 +49,11 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "num = num % 5;\nnum;"
 
-var pitboss = new Pitboss(code);
+var sandbox = new Pitboss(code);
 
-pitboss.run({context: {'num': 23}}, function (err, result) {
+sandbox.run({context: {'num': 23}}, function (err, result) {
   assert.equal(3, result);
-  pitboss.kill(); // pitboss is not needed anymore, so kill the sandboxed process
+  sandbox.kill(); // sandbox is not needed anymore, so kill the sandboxed process
 });
 ```
 
@@ -65,12 +65,12 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "num = num % 5;\n console.log('from sandbox: ' + num);\n num;"
 
-var pitboss = new Pitboss(code);
+var sandbox = new Pitboss(code);
 
-pitboss.run({context: {'num': 23}, libraries: ['console']}, function (err, result) {
+sandbox.run({context: {'num': 23}, libraries: ['console']}, function (err, result) {
   // will print "from sandbox: 5"
   assert.equal(3, result);
-  pitboss.kill(); // pitboss is not needed anymore, so kill the sandboxed process
+  sandbox.kill(); // sandbox is not needed anymore, so end it
 });
 ```
 
@@ -82,10 +82,10 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "while(true) { num % 3 };";
 
-var pitboss = new Pitboss(code, {timeout: 2000});
-pitboss.run({context: {'num': 23}}, function (err, result) {
+var sandbox = new Pitboss(code, {timeout: 2000});
+sandbox.run({context: {'num': 23}}, function (err, result) {
   assert.equal("Timedout", err);
-  pitboss.kill();
+  sandbox.kill();
 });
 ```
 
@@ -97,12 +97,12 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "Not a JavaScript at all!";
 
-var pitboss = new Pitboss(code, {timeout: 2000});
+var sandbox = new Pitboss(code, {timeout: 2000});
 
-pitboss.run({context: {num: 23}}, function (err, result) {
+sandbox.run({context: {num: 23}}, function (err, result) {
   assert.include(err, "VM Syntax Error");
   assert.include(err, "Unexpected identifier");
-  pitboss.kill();
+  sandbox.kill();
 });
 ```
 
@@ -114,11 +114,11 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "var str = ''; while (true) { str = str + 'Memory is a finite resource!'; }";
 
-var pitboss = new Pitboss(code, {timeout: 10000});
+var sandbox = new Pitboss(code, {timeout: 10000});
 
-pitboss.run({context: {num: 23}}, function (err, result) {
+sandbox.run({context: {num: 23}}, function (err, result) {
   assert.equal("Process failed", err);
-  pitboss.kill();
+  sandbox.kill();
 });
 ```
 
