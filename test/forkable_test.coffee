@@ -11,8 +11,8 @@ describe "The forkable process", ->
     return
 
   afterEach ->
-    @runner?.proc?.removeAllListeners 'exit'
     @runner?.kill?()
+    @runner = null
     return
 
   describe "basic operation", ->

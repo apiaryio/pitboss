@@ -17,18 +17,20 @@ process.on 'message', (msg) ->
     create(msg['code'])
   else
     run(msg)
+  return
 
 create = (code) ->
-  code = "\"use strict\";\n#{code}"
+  codeForVm = "\"use strict\";\n#{code}"
   try
     if vm.Script
-      script = new vm.Script code, {filename: 'sandbox'}
+      script = new vm.Script codeForVm, {filename: 'sandbox'}
     else
-      script = vm.createScript(code)
+      script = vm.createScript(codeForVm)
   catch err
     # Fatal, never try again
     errorStatus = STATUS['FATAL']
     errorStatusMsg = "VM Syntax Error: #{err}"
+  return
 
 run = (msg) ->
   if isFatalError()
@@ -57,6 +59,7 @@ run = (msg) ->
     message(res)
   catch err
     error "VM Runtime Error: #{err}", msg.id
+  return
 
 isFatalError = ->
   if errorStatus == STATUS['FATAL']
