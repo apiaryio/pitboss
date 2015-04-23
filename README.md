@@ -7,6 +7,39 @@ Status](https://secure.travis-ci.org/apiaryio/pitboss.png)](http://travis-ci.org
 
 ## A module for running untrusted code
 
+```javascript
+var Pitboss = require('pitboss-ng').Pitboss;
+
+var untrustedCode = "var a = !true; a";
+
+var sandbox = new Pitboss(untrustedCode, {
+  memoryLimit: 32*1024, // 32 MB memory limit (default is 64 MB)
+  timeout: 5*0100 // 5000 ms to perform tasks or die (default is 500 ms = 0.5 s)
+  heartbeatTick: 100 // interval between memory-limit checks (default is 100 ms)
+});
+
+sandbox.run({
+  context: {
+    'foo': 'bar',
+    'key': 'value' // context must be JSON.stringify positive
+  },
+  libraries: {
+    myModule: path.join(__dirname, './my/own/module')
+    // will be available as global "myModule" variable for the untrusted code
+  }
+}, function callback (err, result) {
+  sandbox.kill(); // don't forget to kill the sandbox, if you don't need it anymore
+});
+
+// OR other option: libraries can be an array of system modules
+sandbox.run({
+  context: {},
+  libraries: ['console', 'lodash'] // we will be using global "lodash" & "console"
+}, function callback (err, result) {
+  // finished, kill the sandboxed process
+  sandbox.kill();
+});
+```
 
 ### Runs JS code and returns the last eval'd statement
 
@@ -16,11 +49,11 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "num = num % 5;\nnum;"
 
-var pitboss = new Pitboss(code);
+var sandbox = new Pitboss(code);
 
-pitboss.run({context: {'num': 23}}, function (err, result) {
+sandbox.run({context: {'num': 23}}, function (err, result) {
   assert.equal(3, result);
-  pitboss.kill(); // pitboss is not needed anymore, so kill the sandboxed process
+  sandbox.kill(); // sandbox is not needed anymore, so kill the sandboxed process
 });
 ```
 
@@ -32,12 +65,12 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "num = num % 5;\n console.log('from sandbox: ' + num);\n num;"
 
-var pitboss = new Pitboss(code);
+var sandbox = new Pitboss(code);
 
-pitboss.run({context: {'num': 23}, libraries: ['console']}, function (err, result) {
+sandbox.run({context: {'num': 23}, libraries: ['console']}, function (err, result) {
   // will print "from sandbox: 5"
   assert.equal(3, result);
-  pitboss.kill(); // pitboss is not needed anymore, so kill the sandboxed process
+  sandbox.kill(); // sandbox is not needed anymore, so end it
 });
 ```
 
@@ -49,10 +82,10 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "while(true) { num % 3 };";
 
-var pitboss = new Pitboss(code, {timeout: 2000});
-pitboss.run({context: {'num': 23}}, function (err, result) {
+var sandbox = new Pitboss(code, {timeout: 2000});
+sandbox.run({context: {'num': 23}}, function (err, result) {
   assert.equal("Timedout", err);
-  pitboss.kill();
+  sandbox.kill();
 });
 ```
 
@@ -64,12 +97,12 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "Not a JavaScript at all!";
 
-var pitboss = new Pitboss(code, {timeout: 2000});
+var sandbox = new Pitboss(code, {timeout: 2000});
 
-pitboss.run({context: {num: 23}}, function (err, result) {
+sandbox.run({context: {num: 23}}, function (err, result) {
   assert.include(err, "VM Syntax Error");
   assert.include(err, "Unexpected identifier");
-  pitboss.kill();
+  sandbox.kill();
 });
 ```
 
@@ -81,11 +114,11 @@ var Pitboss = require('pitboss-ng').Pitboss;
 
 var code = "var str = ''; while (true) { str = str + 'Memory is a finite resource!'; }";
 
-var pitboss = new Pitboss(code, {timeout: 10000});
+var sandbox = new Pitboss(code, {timeout: 10000});
 
-pitboss.run({context: {num: 23}}, function (err, result) {
+sandbox.run({context: {num: 23}}, function (err, result) {
   assert.equal("Process failed", err);
-  pitboss.kill();
+  sandbox.kill();
 });
 ```
 

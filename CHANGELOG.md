@@ -1,3 +1,9 @@
+# 0.3.0
+
+- use [pidusage](https://www.npmjs.org/package/pidusage) to monitor memory footprint (supports *nix, Darwin, Win platform)
+- introduce `pitboss.kill()` to be run after `pitboss.run` to cleanly kill sandboxed fork
+- updated [README](README.md) with examples how to pass libraries into sandboxed code
+
 # 0.2.1
 
 - little changes to package.json regarding repository entry
