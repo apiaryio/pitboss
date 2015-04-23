@@ -15,7 +15,7 @@ describe "Pitboss running code", ->
     pitboss = new Pitboss(code)
 
   after ->
-    pitboss.runner.kill()
+    pitboss.kill()
 
   it "should take a JSON encodable message", (done) ->
     pitboss.run context: {data: "test"}, (err, result) ->
@@ -45,7 +45,7 @@ describe "Pitboss trying to access variables out of context", ->
     pitboss = new Pitboss(code)
 
   after ->
-    pitboss.runner.kill()
+    pitboss.kill()
 
   it "should not allow for context variables changes", (done) ->
 
@@ -67,7 +67,7 @@ describe "Pitboss modules loading code", ->
     pitboss = new Pitboss(code)
 
   afterEach ->
-    pitboss.runner.kill()
+    pitboss.kill()
 
   it "should not return an error when loaded module is used", (done) ->
     pitboss.run context: {data: "test"}, libraries: ['console'], (err, result) ->
@@ -97,8 +97,7 @@ describe "Running dubius code", ->
     pitboss = new Pitboss(code)
 
   after ->
-    pitboss.runner.kill()
-
+    pitboss.kill()
 
   it "should take a JSON encodable message", (done) ->
     pitboss.run context: {data: 123}, (err, result) ->
@@ -116,7 +115,7 @@ describe "Running shitty code", ->
     pitboss = new Pitboss(code)
 
   after ->
-    pitboss.runner.kill()
+    pitboss.kill()
 
   it "should return the error", (done) ->
     pitboss.run context: {data: 123}, (err, result) ->
@@ -140,7 +139,7 @@ describe "Running infinite loop code", ->
     """
 
   afterEach ->
-    runner.kill()
+    runner.kill(1)
     runner = null
 
   it "should timeout and restart fork", (done) ->
@@ -164,14 +163,13 @@ describe "Running infinite loop code", ->
         assert.equal "OK", result
         done()
 
-    # trigger manual kill
+    # trigger manual process kill
     runner.proc.kill('SIGKILL')
     return
 
 
 describe "Running code which causes memory leak", ->
   runner = null
-  doneCalled = false
 
   before ->
     code = """
@@ -188,11 +186,9 @@ describe "Running code which causes memory leak", ->
       memoryLimit: 1024*100
 
   after ->
-    runner?.kill()
+    runner.kill(1)
 
   it "should end with MemoryExceeded error", (done) ->
     runner.run context: {infinite: true}, (err, result) ->
       assert.equal "MemoryExceeded", err
-      if not doneCalled
-        doneCalled = true
-        return done()
+      return done()

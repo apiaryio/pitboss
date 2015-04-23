@@ -14,6 +14,9 @@ exports.Pitboss = class Pitboss
     @next()
     return
 
+  kill: ->
+    @runner?.kill(1)
+
   next: ->
     return false if @runner.running
     c = @queue.shift()
@@ -35,6 +38,11 @@ exports.Runner = class Runner extends EventEmitter
     super()
 
   launchFork: ->
+    if @proc
+      @proc.removeAllListeners? 'exit'
+      @proc.removeAllListeners? 'message'
+      if @proc.connected
+        @proc.kill('SIGTERM')
     @proc = fork(path.join(__dirname, '../lib/forkable.js'))
     @proc.on 'message', @messageHandler
     @proc.on 'exit', @failedForkHandler
@@ -58,8 +66,12 @@ exports.Runner = class Runner extends EventEmitter
     @proc.disconnect() if @proc and @proc.connected
     return
 
-  kill: ->
-    @proc.kill("SIGKILL") if @proc and @proc.connected
+  kill: (dieWithoutRestart) ->
+    if @proc and @proc.connected
+      if dieWithoutRestart
+        @proc.removeAllListeners 'exit'
+        @proc.removeAllListeners 'message'
+      @proc.kill("SIGTERM")
     @closeTimer()
     return
 
@@ -77,7 +89,7 @@ exports.Runner = class Runner extends EventEmitter
     @notifyCompleted()
     return
 
-  # try to launch the subprocess again, but notify callback (if any)
+  # try to launch the subprocess again, BUT notify callback (if any)
   failedForkHandler: =>
     @running = false
     @closeTimer(@timer)
