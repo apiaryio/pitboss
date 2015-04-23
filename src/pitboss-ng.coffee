@@ -1,6 +1,7 @@
 path = require 'path'
-{fork, exec} = require 'child_process'
+{fork} = require 'child_process'
 {EventEmitter}  = require 'events'
+pusage = require 'pidusage'
 
 exports.Pitboss = class Pitboss
   constructor: (code, options) ->
@@ -28,21 +29,15 @@ exports.Runner = class Runner extends EventEmitter
     @options.memoryLimit ||= 64*1024 # memoryLimit is in kBytes, so 64 MB here
     @options.timeout ||= 500
     @options.heartBeatTick ||= 100
-    unless @options.rssizeCommand
-      if process.platform is 'darwin'
-        @options.rssizeCommand = 'ps -p PID -o rss='
-      else if process.platform is 'linux'
-        @options.rssizeCommand = 'ps -p PID -o rssize='
-    @launchFork()
-    @running = false
     @callback = null
+    @running = false
+    @launchFork()
     super()
 
   launchFork: ->
     @proc = fork(path.join(__dirname, '../lib/forkable.js'))
     @proc.on 'message', @messageHandler
     @proc.on 'exit', @failedForkHandler
-    @rssizeCommand = @options.rssizeCommand.replace('PID',@proc.pid)
     @proc.send {code: @code, timeout: (@options.timeout + 100)}
     return
 
@@ -82,6 +77,7 @@ exports.Runner = class Runner extends EventEmitter
     @notifyCompleted()
     return
 
+  # try to launch the subprocess again, but notify callback (if any)
   failedForkHandler: =>
     @running = false
     @closeTimer(@timer)
@@ -98,13 +94,19 @@ exports.Runner = class Runner extends EventEmitter
     return
 
   memoryExceeded: =>
-    exec @rssizeCommand, (err, stdout, stderr) =>
-      err = err || stderr
+    unless @proc?.pid
+      return
 
+    pid = @proc.pid
+    pusage.stat @proc.pid, (err, stat = {}) =>
       if err
-        console.error "Command #{@rssizeCommand} failed:", err
+        if @running # still running and some error occurs
+          console.error "Process memory usage command failed", err
 
-      if (not err) and parseInt(stdout, 10) > @options.memoryLimit
+      pusage.unmonitor(pid)
+
+      # memoryLimit is in kBytes, whereas stat.memory in bytes
+      if (not err) and stat.memory > (@options.memoryLimit * 1024)
         @currentError = "MemoryExceeded"
         @kill()
       return

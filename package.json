@@ -21,7 +21,8 @@
     "test": "./scripts/test"
   },
   "dependencies": {
-    "clone": "^1.0.2"
+    "clone": "^1.0.2",
+    "pidusage": "^0.1.1"
   },
   "devDependencies": {
     "chai": "^2.2.0",
