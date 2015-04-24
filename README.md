@@ -10,7 +10,7 @@
 ```javascript
 var Pitboss = require('pitboss-ng').Pitboss;
 
-var untrustedCode = "var a = !true; a";
+var untrustedCode = "var a = !true;\n a";
 
 var sandbox = new Pitboss(untrustedCode, {
   memoryLimit: 32*1024, // 32 MB memory limit (default is 64 MB)
@@ -19,21 +19,25 @@ var sandbox = new Pitboss(untrustedCode, {
 });
 
 sandbox.run({
-  context: {
-    'foo': 'bar',
-    'key': 'value' // context must be JSON.stringify positive
+  context: {       // context is an object of variables/values accessible by the untrusted code
+    'foo': 'bar',  // context must be JSON.stringify positive
+    'key': 'value' //  = no RegExp, Date, circular references, Buffer or more crazy things
   },
   libraries: {
-    myModule: path.join(__dirname, './my/own/module')
+    myModule: path.join(__dirname, './my/own/module'),
     // will be available as global "myModule" variable for the untrusted code
+    'crypto': 'crypto', // you can also require system/installed packages
+    '_': 'underscore'   // require underscore the traditional way
   }
 }, function callback (err, result) {
+  // result is synchronous "return" of the last line in your untrusted code, here "a = !true", so false
+  console.log('Result is:', result); // prints "Result is: false"
   sandbox.kill(); // don't forget to kill the sandbox, if you don't need it anymore
 });
 
 // OR other option: libraries can be an array of system modules
 sandbox.run({
-  context: {},
+  context: {}, // no data-variables are passed to context
   libraries: ['console', 'lodash'] // we will be using global "lodash" & "console"
 }, function callback (err, result) {
   // finished, kill the sandboxed process
