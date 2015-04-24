@@ -159,7 +159,7 @@ exports.Runner = class Runner extends EventEmitter
 
 
   winMemory: (pid, cb) =>
-    taskListPath = path.join('C:\\Windows\\System32', 'tasklist.exe') + ' '
+    taskListPath = 'tasklist.exe '
 
     taskList = (arg, taskListCallback) ->
       exec taskListPath + arg, (err, stdout) ->
