@@ -1,3 +1,9 @@
+# 0.3.2
+
+- added direct support for memory management at win32/win64 platforms
+- using [appVeyor](https://ci.appveyor.com/project/Apiary/pitboss) to test at Windows
+- using [gulp](https://www.npmjs.org/package/gulp) for development and tasks, works cross-platform
+
 # 0.3.1
 
 - added npm-debug.log and *.log into gitignore/npmignore
