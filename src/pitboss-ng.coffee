@@ -1,7 +1,9 @@
 path = require 'path'
-{fork} = require 'child_process'
+{fork, exec} = require 'child_process'
 {EventEmitter}  = require 'events'
 pusage = require 'pidusage'
+os = require 'os'
+csv = require 'csv'
 
 exports.Pitboss = class Pitboss
   constructor: (code, options) ->
@@ -110,7 +112,18 @@ exports.Runner = class Runner extends EventEmitter
       return
 
     pid = @proc.pid
-    pusage.stat @proc.pid, (err, stat = {}) =>
+
+    if os.platform() in ['win', 'win32', 'win64']
+      return @winMemory pid, (err, stats = []) =>
+        if err
+          if @running # still running and some error occurs
+            console.error "Process memory usage command failed", err
+        if not err and (stats?[0]?.memUsage or 0) > @options.memoryLimit
+          @currentError = "MemoryExceeded"
+          @kill()
+        return
+
+    pusage.stat pid, (err, stat = {}) =>
       if err
         if @running # still running and some error occurs
           console.error "Process memory usage command failed", err
@@ -144,3 +157,54 @@ exports.Runner = class Runner extends EventEmitter
       @memoryTimer = null
     return
 
+
+  winMemory: (pid, cb) =>
+    taskListPath = 'tasklist.exe '
+
+    taskList = (arg, taskListCallback) ->
+      exec taskListPath + arg, (err, stdout) ->
+        taskListCallback err, stdout
+        return
+      return
+
+    procStat = (procStatCallback) ->
+      type = 'PID'
+      arg = "/fi \"PID eq #{pid}\" /fo CSV"
+
+      stats = []
+
+      taskList arg, (err, stdout = '') ->
+        if err or not stdout
+          return
+
+        csv.parse stdout, (err, rows) ->
+          if err
+            return procStatCallback err, stats
+
+          if rows?.length > 0
+            for row in rows when parseInt(row[1], 10) is pid
+              if row[4]
+                memVal = "#{row[4] or ''}".toLowerCase().replace(',', '.').trim()
+                if memVal.indexOf('k')
+                  memVal = 1000 * parseInt(memVal.slice(0, -1)) # because it was 1234.567 k
+                else if memVal.indexOf('m')
+                  memVal = 1000 * 1000 * parseInt(memVal.slice(0, -1), 10) # because it was 1234.567 M
+                else
+                  memVal = 1000 * parseFloat memVal.slice(0, -1)
+              else
+                # kiloBytes by default
+                memVal = parseFloat row[4]
+
+              stats.push
+                name: row[0]
+                pid: pid
+                memUsage: memVal
+            procStatCallback err, stats
+          else
+            # fail silently
+            procStatCallback err, stats
+          return
+        return
+      return
+    procStat cb
+    return
