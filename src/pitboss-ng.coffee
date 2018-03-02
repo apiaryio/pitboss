@@ -3,7 +3,7 @@ path = require 'path'
 {EventEmitter}  = require 'events'
 pusage = require 'pidusage'
 os = require 'os'
-csv = require 'csv'
+csvParse = require 'csv-parse'
 
 exports.Pitboss = class Pitboss
   constructor: (code, options) ->
@@ -177,7 +177,7 @@ exports.Runner = class Runner extends EventEmitter
         if err or not stdout
           return
 
-        csv.parse stdout, (err, rows) ->
+        csvParse stdout, (err, rows) ->
           if err
             return procStatCallback err, stats
 
