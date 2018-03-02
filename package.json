@@ -21,7 +21,7 @@
     "prepublish": "gulp build"
   },
   "dependencies": {
-    "clone": "^1.0.2",
+    "clone": "^2.1.1",
     "csv": "^0.4.2",
     "pidusage": "1.1.5"
   },
