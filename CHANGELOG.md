@@ -1,3 +1,18 @@
+# 1.0.0
+
+- BREAKING CHANGE: Supports NodeJS 8.10+
+- BREAKING CHANGE: converted to ES6 Javascript, no coffee-script anymore
+- changed dependency: from [csv](https://www.npmjs.org/package/csv) to [csv-parse](https://www.npmjs.org/package/csv-parse) 4.3.4
+- upgraded dependency: [clone](https://www.npmjs.org/package/clone) to 2.1.2
+- upgraded dependency: [pidusage](https://www.npmjs.org/package/pidusage) to 2.0.17
+- upgraded devDependency: [chai](https://www.npmjs.org/package/chai) to 4.2.0
+- upgraded devDependency: [mocha](https://www.npmjs.org/package/mocha) to 6.0.2
+- removed devDependency: [coffee-script](https://www.npmjs.org/package/coffee-script)
+- removed devDependency: [gulp](https://www.npmjs.org/package/gulp)
+- removed devDependency: [gulp-coffee](https://www.npmjs.org/package/gulp-coffee)
+- removed devDependency: [gulp-mocha](https://www.npmjs.org/package/gulp-mocha)
+- removed devDependency: [gulp-util](https://www.npmjs.org/package/gulp-util)
+
 # 0.3.2
 
 - added direct support for memory management at win32/win64 platforms
