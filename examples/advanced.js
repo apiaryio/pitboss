@@ -5,9 +5,9 @@ var untrustedCode = "if (typeof returnMe === 'undefined') {\n\
 }\n\
 var sortAsNumbers = function (a, b) {\n\
   var aInt = parseInt(a, 10), bInt = parseInt(b, 10);\n\
-  if (a === b) {\n\
+  if (aInt === bInt) {\n\
     return 0;\n\
-  } else if (a < b) {\n\
+  } else if (aInt < bInt) {\n\
     return -1;\n\
   }\n\
   return 1;\n\
