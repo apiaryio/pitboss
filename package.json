@@ -1,6 +1,6 @@
 {
   "name": "pitboss-ng",
-  "version": "0.3.3",
+  "version": "1.0.0-next",
   "description": "Run untrusted code in a seperate process using VM module. With timeout and memory limit management",
   "keywords": [
     "sandbox",
@@ -17,26 +17,20 @@
   },
   "author": "Apiary Inc <support@apiary.io>",
   "scripts": {
-    "test": "gulp test",
-    "prepublish": "gulp build"
+    "test": "mocha test --timeout=120000 --reporter=spec --exit test"
   },
   "dependencies": {
-    "clone": "^1.0.2",
-    "csv": "^0.4.2",
-    "pidusage": "1.1.5"
+    "clone": "^2.1.2",
+    "csv-parse": "^4.3.4",
+    "pidusage": "^2.0.17"
   },
   "devDependencies": {
-    "chai": "^2.2.0",
-    "coffee-script": "^1.9.2",
-    "gulp": "^3.8.11",
-    "gulp-coffee": "^2.3.1",
-    "gulp-mocha": "^2.0.1",
-    "gulp-util": "^3.0.4",
-    "mocha": "^2.2.4"
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2"
   },
   "main": "./lib/pitboss-ng.js",
   "engines": {
-    "node": ">= 0.10.x"
+    "node": ">= 8.10"
   },
   "license": "MIT"
 }
