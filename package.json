@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "clone": "^2.1.2",
-    "csv-parse": "^4.3.4",
+    "csv-parse": "^4.4.3",
     "pidusage": "^2.0.17"
   },
   "devDependencies": {
