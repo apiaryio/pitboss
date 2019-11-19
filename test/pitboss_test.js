@@ -195,6 +195,46 @@ describe('Running shitty code', function() {
   });
 });
 
+describe('Running securely sandboxed code', function() {
+  const codes = [
+    {
+      title: 'process',
+      code: 'this.constructor.constructor("return process")();',
+      expectErr: 'VM Runtime Error: ReferenceError: process is not defined',
+    },
+    {
+      title: '1e9',
+      code: 'this.constructor.constructor("return 1e9;")();',
+      expect: 1e9
+    },
+  ].forEach(({ title, code, expect, expectErr }) => {
+    describe(`Access to read ${title} using this.constructor should be secured`, () => {
+      let pitboss = null;
+
+      before(function() {
+        pitboss = new Pitboss(code);
+      });
+
+      after(function() {
+        pitboss.kill();
+      });
+
+      it(`should return ${expectErr ? 'an error' : 'a value'}`, function(done) {
+        pitboss.run({},
+        (err, result) => {
+          if (expectErr) {
+            assert.include(err, expectErr);
+            assert.isUndefined(result);
+          } else {
+            assert.equal(result, expect);
+          }
+          done();
+        });
+      });
+    });
+  })
+});
+
 describe('Running infinite loop code', function() {
   let runner = null;
   const code = `if (typeof infinite != 'undefined' && infinite === true) {
