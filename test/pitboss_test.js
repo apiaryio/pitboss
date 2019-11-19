@@ -138,7 +138,7 @@ describe('Running dubius code', function() {
   let pitboss = null;
   const code = `// EchoTron: returns the 'data' variable in a VM
     if(typeof data === 'undefined') {
-      var data = null
+      var data = 'data was undefined';
     };
     data`;
 
@@ -186,7 +186,7 @@ describe('Running shitty code', function() {
         },
       },
       function(err, result) {
-        assert.include(err, 'VM Syntax Error: SyntaxError:');
+        assert.include(err, 'VM Runtime Error: SyntaxError:');
         assert.include(err, 'Unexpected identifier');
         assert.isUndefined(result);
         done();
@@ -291,7 +291,7 @@ describe('Running infinite loop code', function() {
         },
       },
       function(err, result) {
-        assert.equal('Process Failed', err);
+        assert.equal('Timedout', err);
         runner.run(
           {
             context: {

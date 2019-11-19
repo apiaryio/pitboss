@@ -3,11 +3,12 @@ const { fork } = require('child_process');
 
 describe('The forkable process', function() {
   const referenceErrorMsg = 'VM Runtime Error: ReferenceError:';
-  const syntaxErrorMsg = 'VM Syntax Error: SyntaxError:';
+  const syntaxErrorMsg = 'VM Runtime Error: SyntaxError:';
   const typeErrorMsg = 'VM Runtime Error: TypeError:';
 
-  beforeEach(function() {
+  beforeEach(function(done) {
     this.runner = fork('./lib/forkable.js');
+    this.runner.once('message', (msg) => done(msg !== 'ready'));
   });
 
   afterEach(function() {
@@ -23,7 +24,7 @@ describe('The forkable process', function() {
     beforeEach(function() {
       this.code = `// EchoTron: returns the 'data' variable in a VM
       if(typeof data === "undefined") {
-        var data = null
+        var data = 1
       };
       data`;
     });
@@ -31,7 +32,7 @@ describe('The forkable process', function() {
     it('run without errors', function(done) {
       this.runner.on('message', function(msg) {
         assert.equal(msg.id, '123');
-        assert.equal(msg.result, null);
+        assert.strictEqual(msg.result, 1);
         done();
       });
       this.runner.send({
@@ -91,23 +92,21 @@ describe('The forkable process', function() {
 
   describe('Running code that uses Buffer', function() {
     beforeEach(function() {
-      this.code = `var buf = new Buffer();
-      123;`;
+      this.code = `var buf = new Buffer('abc');
+      buf.toString();`;
     });
 
-    it('should fail on require', function(done) {
+    it('should keep working', function(done) {
       this.runner.on('message', function(msg) {
-        assert.equal(msg.id, '123');
-        assert.equal(msg.result, null);
-        assert.include(msg.error, 'Buffer is not defined');
-        assert.include(msg.error, referenceErrorMsg);
+        assert.equal(msg.id, 'XYZ');
+        assert.equal(msg.result, 'abc');
         done();
       });
       this.runner.send({
         code: this.code,
       });
       this.runner.send({
-        id: '123',
+        id: 'XYZ',
         context: {},
       });
     });
