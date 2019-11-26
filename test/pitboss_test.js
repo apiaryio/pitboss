@@ -138,7 +138,7 @@ describe('Running dubius code', function() {
   let pitboss = null;
   const code = `// EchoTron: returns the 'data' variable in a VM
     if(typeof data === 'undefined') {
-      var data = null
+      var data = 'data was undefined';
     };
     data`;
 
@@ -186,13 +186,53 @@ describe('Running shitty code', function() {
         },
       },
       function(err, result) {
-        assert.include(err, 'VM Syntax Error: SyntaxError:');
+        assert.include(err, 'VM Runtime Error: SyntaxError:');
         assert.include(err, 'Unexpected identifier');
         assert.isUndefined(result);
         done();
       }
     );
   });
+});
+
+describe('Running securely sandboxed code', function() {
+  const codes = [
+    {
+      title: 'process',
+      code: 'this.constructor.constructor("return process")();',
+      expectErr: 'VM Runtime Error: ReferenceError: process is not defined',
+    },
+    {
+      title: '1e9',
+      code: 'this.constructor.constructor("return 1e9;")();',
+      expect: 1e9
+    },
+  ].forEach(({ title, code, expect, expectErr }) => {
+    describe(`Access to read ${title} using this.constructor should be secured`, () => {
+      let pitboss = null;
+
+      before(function() {
+        pitboss = new Pitboss(code);
+      });
+
+      after(function() {
+        pitboss.kill();
+      });
+
+      it(`should return ${expectErr ? 'an error' : 'a value'}`, function(done) {
+        pitboss.run({},
+        (err, result) => {
+          if (expectErr) {
+            assert.include(err, expectErr);
+            assert.isUndefined(result);
+          } else {
+            assert.equal(result, expect);
+          }
+          done();
+        });
+      });
+    });
+  })
 });
 
 describe('Running infinite loop code', function() {
@@ -251,7 +291,7 @@ describe('Running infinite loop code', function() {
         },
       },
       function(err, result) {
-        assert.equal('Process Failed', err);
+        assert.equal('Timedout', err);
         runner.run(
           {
             context: {

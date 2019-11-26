@@ -12,7 +12,7 @@ var sortAsNumbers = function (a, b) {\n\
   }\n\
   return 1;\n\
 };\n\
-console.log('message from VM: returnMe =', returnMe);\n\
+console.log('Message from ' + os.platform() + ' OS VM: returnMe =', returnMe);\n\
 \n\
 returnMe.theArray.sort(sortAsNumbers);\n\
 returnMe;\n\
@@ -32,7 +32,7 @@ sandbox.run({
   context: {
     returnMe: returnMe
   },
-  libraries: ['console']
+  libraries: ['console', 'os']
 }, function callback (err, result) {
   sandbox.kill();
   if (err) {
