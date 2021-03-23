@@ -1,6 +1,6 @@
 {
   "name": "pitboss-ng",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Run untrusted code in a seperate process using VM2 module. With timeout and memory limit management",
   "keywords": [
     "sandbox",
@@ -27,8 +27,8 @@
     "vm2": "^3.8.4"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^6.2.2"
+    "chai": "^4.3.4",
+    "mocha": "^8.3.2"
   },
   "main": "./lib/pitboss-ng.js",
   "engines": {
