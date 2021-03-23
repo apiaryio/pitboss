@@ -2,7 +2,7 @@
 environment:
   matrix:
   # node.js
-    - nodejs_version: "8"
+    - nodejs_version: "12"
 
 matrix:
   fast_finish: true
@@ -17,7 +17,7 @@ hosts:
 
 # Install scripts. (runs after repo cloning)
 install:
-  - npm -g install npm@6.4.1
+  - npm -g install npm@6
   # install modules
   - npm install
 
